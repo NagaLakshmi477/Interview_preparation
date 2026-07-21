@@ -1,4 +1,4 @@
-# hat is the difference between terraform refresh and terraform plan?
+# what is the difference between terraform refresh and terraform plan?
 - refresh command is updates the state file
 - plan commands check the state file desired state with actual state
 # What are Lifecycle Hooks in Terraform?
