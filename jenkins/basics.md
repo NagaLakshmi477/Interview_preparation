@@ -147,3 +147,45 @@ In my day-to-day work, I commonly use the following Jenkins plugins:
 * **JUnit Plugin**
   Publishes test results and helps in tracking test reports within Jenkins.
 
+## SonarQube Implementation – Interview Explanation
+
+In my project, when I joined, we didn’t have any code quality monitoring in place—no tracking of code coverage, bugs, or vulnerabilities. I took the initiative to implement SonarQube and drive adoption across teams.
+
+I followed a **Shift Left strategy**, ensuring code quality checks happen early in the development lifecycle rather than later.
+
+### Phase 1 – Setup & Visibility
+
+I integrated SonarQube with Jenkins by configuring the SonarScanner in CI pipelines. Then I onboarded all repositories by creating SonarQube projects and asking teams to add configuration files.
+
+We ran initial scans to establish a baseline for code quality—covering bugs, vulnerabilities, code smells, and coverage. At this stage, the goal was visibility, not enforcement.
+
+### Phase 2 – Adoption & Improvement
+
+Next, I worked closely with developers to help them understand SonarQube reports and improve their code.
+
+We gave teams around 2–3 months to fix existing issues and reduce technical debt. I conducted regular tracking sessions and encouraged best practices like writing unit tests, reducing duplication, and improving code structure.
+
+### Phase 3 – Quality Gate Enforcement
+
+Once the code quality improved, I introduced Quality Gates into the Jenkins pipeline.
+
+Initially, builds showed warnings without failing. After a short buffer period, we enforced strict gates—any code failing quality checks (like low coverage, bugs, or vulnerabilities) would fail the build automatically.
+
+### Outcome
+
+As a result:
+
+* Code quality became standardized across all components
+* Test coverage improved significantly (target ~80%)
+* Security vulnerabilities were reduced
+* Maintainability improved
+* Developers became proactive in fixing issues
+
+This initiative also promoted a strong quality culture in the team, and I was recognized with a Best Performer Award for driving this change.
+
+### Key Skills
+
+* CI/CD integration (Jenkins + SonarQube)
+* Shift Left strategy implementation
+* Driving team adoption and change management
+* Improving code quality, security, and maintainability
