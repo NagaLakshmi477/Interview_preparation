@@ -126,7 +126,7 @@ Explain Kubernetes Architecture.
 What are the Control Plane components in Kubernetes?  
 What are the Worker Node components in Kubernetes?  
 What is the role of containerd?  
-What is the role of kube-proxy?  
+What is the role of kube-proxy?    
 What happens when a container crashes in Kubernetes?  
 A Pod is in Pending state. How do you troubleshoot it?  
 What are the common reasons for a Pod to remain in Pending state?  
