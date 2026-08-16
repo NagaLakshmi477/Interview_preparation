@@ -1,0 +1,62 @@
+In my current project, we implemented an end-to-end CI/CD pipeline for deploying microservices on AWS EKS.
+
+Whenever a developer makes a code change and pushes it to GitHub, Jenkins triggers the pipeline and first checks out the source code.
+
+After checkout, we run the required tests, SonarQube code-quality analysis, dependency scanning, and vulnerability scanning. We followed a Shift-Left DevSecOps approach, so we identify most of the quality and security issues at the early stage before promoting the application to higher environments. We also use quality gates, so if the required criteria are not satisfied, the pipeline stops.
+
+Once all the checks are successful, we build the Docker image and tag it with a specific version. Then we push the image to Amazon ECR.
+
+After the image is available in ECR, we deploy it to our Amazon EKS cluster. Kubernetes manages the Pods and Services, and we use Ingress or the AWS load-balancing layer to expose the application.
+
+For deployment, we also used GitOps with Argo CD. Argo CD keeps the Kubernetes desired state in Git and continuously synchronizes that state with the EKS cluster.
+
+For monitoring, we used Prometheus and Grafana for Kubernetes and application metrics, and CloudWatch for AWS infrastructure monitoring.
+
+So the overall flow is: Developer → GitHub → Jenkins → Testing and Security Scanning → Docker Build → ECR → Argo CD/EKS → Kubernetes → Load Balancer → Users, with Prometheus, Grafana, and CloudWatch for monitoring."
+  Developer
+    |
+    v
+ GitHub
+    |
+    v
+ Jenkins
+    |
+    +--> Unit Testing
+    |
+    +--> SonarQube
+    |
+    +--> Dependency Scan
+    |
+    +--> Vulnerability Scan
+    |
+    v
+ Docker Build
+    |
+    v
+ Amazon ECR
+    |
+    v
+ Argo CD
+    |
+    v
+ Amazon EKS
+    |
+    v
+ Kubernetes
+    |
+    v
+ Ingress / ALB
+    |
+    v
+   Users
+
+Monitoring:
+Prometheus + Grafana
+CloudWatch
+
+
+"If Jenkins is already deploying, why do you need Argo CD?"
+
+Say:
+
+"In our setup, Jenkins handled the CI activities such as build, test, code-quality checks, security scanning, and image publishing to ECR. Argo CD handled the Kubernetes deployment part using GitOps. So we separated CI and CD responsibilities."
