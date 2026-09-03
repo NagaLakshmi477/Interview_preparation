@@ -1,6 +1,22 @@
 1. Self-Introduction
 
    - Tell me about yourself.
+Hi, I'm Lakshmi. I'm a DevOps Engineer with around 4 years of experience in cloud infrastructure, CI/CD, containerization, and deployment automation.
+
+Currently, I'm working with HTC Global Services on the Open ERP Immigration project. My main responsibilities include creating and maintaining CI/CD pipelines, containerizing applications using Docker, provisioning infrastructure on AWS using Terraform, and deploying applications into Kubernetes environments.
+
+I have hands-on experience with AWS services such as EC2, EKS, ECR, VPC, S3, IAM, ALB, and Route 53. I also work with Jenkins for CI/CD automation and Terraform for infrastructure provisioning.
+
+On the Kubernetes side, I have worked with Amazon EKS, Pods, Deployments, Helm, services, storage, RBAC, and HPA. I have also worked with Argo CD for continuous deployment and GitOps-based application delivery.
+
+Apart from this, I have experience with DevSecOps practices, including SonarQube, quality gates, and vulnerability scanning. For monitoring and troubleshooting, I have worked with Prometheus and Grafana.
+
+Before moving into DevOps, I worked as a Python Developer, where I worked with Python, REST APIs, PostgreSQL, and SQLAlchemy.
+
+Overall, I enjoy automation, troubleshooting deployment issues, and improving the reliability of applications and infrastructure.
+
+That's a brief introduction about me.
+
 
 2. Terraform – Deployment
 

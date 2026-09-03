@@ -1,3 +1,7 @@
+
+## Give a real-time example of automation you implemented.
+## Which scripting languages have you worked with?
+
 # 🛠️ DevOps
 
 DevOps is the process of building, deploying, and testing the code written by the developer on the same day instead of waiting to complete the entire development.
