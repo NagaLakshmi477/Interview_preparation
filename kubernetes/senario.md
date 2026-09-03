@@ -1,174 +1,750 @@
-## what are the some challenges with promotheus
+# Kubernetes & Prometheus — Interview Notes
 
-despite of very good at k8s promotheus still have some issues
+## 1. Challenges with Prometheus
 
+Prometheus is very good for Kubernetes monitoring, but in large environments there can still be challenges related to **resource management, OOM issues, scalability, and upgrades**.
 
+---
 
-challanges
-==============
-## resource sharing
-- How you can allocates resources onmultiple envi(dev,prod,QA)
-As a devops engineer when joining on a organization there was a cluster that shared across all environments
-beacuse of one of pod leaking memory entire cluster was impacted so we don't know which pod is going down and which namespaces
-beacuse of out of memory as a devops engineer i ahve setup the resouce quota and resource limit on the pods of the particular namespace
-beacuse of which i can identify which pod is 
-or
-As a DevOps engineer, when I joined an organization, there was a Kubernetes cluster shared across multiple environments like Dev, QA, and Prod.
+### 1.1 Resource Sharing Across Multiple Environments
 
-One day, one of the Pods had a memory leak and started consuming more memory. Because there were no proper resource limits, it impacted the entire cluster, and it was difficult to identify which Pod or namespace was consuming more resources.
+One challenge is sharing Kubernetes resources across multiple environments such as:
 
-So, as a DevOps engineer, I set up ResourceQuota for each namespace and configured resource requests and limits for the Pods.
+* Development
+* QA
+* Production
 
-Because of this, we were able to control how much CPU and memory each namespace and Pod could consume. If any Pod started consuming excessive resources, it would not impact the entire cluster, and we could easily identify which Pod or namespace was causing the issue.
+#### Real-World Scenario
 
-- OOM killed issue with POD
-so after setting the resuorce quota you know that one pod is getting OOM killed which is a crashloopbackoff
-so what i have was this is java based micro service so i login into this pod and shared head dump and tread dump and shared those to developer team
-or
-If a Pod is getting OOMKilled, first I identify which Pod is consuming more memory.
+As a DevOps Engineer, when I joined an organization, there was a Kubernetes cluster shared across multiple environments such as Dev, QA, and Production.
 
-In my case, after setting the resource quotas and resource limits, I identified that one of the Pods was getting OOMKilled and going into CrashLoopBackOff.
+One day, one of the Pods had a memory leak and started consuming excessive memory. Because there were no proper resource limits, it impacted the entire cluster, and it was difficult to identify which Pod or namespace was consuming the resources.
 
-This was a Java-based microservice. So, I checked the Pod and collected the Java heap dump and thread dump to understand why the application was consuming more memory.
+#### Solution
 
-I shared the heap dump and thread dump with the development team so they could analyze the application and identify the memory leak or memory-related issue.
+As a DevOps Engineer, I configured:
 
-Based on their analysis, we worked on fixing the issue and then monitored the Pod to make sure it was running properly without getting OOMKilled again.
+* `ResourceQuota` at the namespace level
+* `Resource Requests`
+* `Resource Limits` for Pods/containers
 
-- Upgrades
+For example:
 
-For Kubernetes upgrades, we prepared a very detailed manual with step-by-step procedures.
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: namespace-quota
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+```
 
-Before performing the upgrade, I documented how to take the required backups and how to check the Kubernetes release notes and upgrade requirements.
+I also configured resource requests and limits for application containers.
 
-I divided the upgrade process into two main parts: the control plane components and the worker nodes.
+This helped us:
 
-For the control plane, I documented the order of the components to be upgraded and how to verify the health of important components like `etcd` and the API server before and after the upgrade.
+* Control CPU and memory consumption
+* Prevent one namespace from consuming unlimited resources
+* Identify which namespace was consuming excessive resources
+* Reduce the impact of resource exhaustion on other workloads
 
-For the worker nodes, before upgrading a node, I first drain the node so that the workloads are safely moved to other available nodes. Then I perform the upgrade and verify that the node comes back to the `Ready` state.
+### Important distinction
 
-After upgrading all the nodes, I test the cluster and verify that all the Pods, Services, and applications are working properly.
+**ResourceQuota** controls the total resource consumption allowed for a namespace.
 
-We documented the complete process in a manual so that the upgrade could be performed in a controlled way and the same steps could be followed by other team members as well.
+**Resource requests/limits** control the resources requested/allowed for individual containers.
 
+---
 
-## k8 architecture
+# 2. OOMKilled Issue with Pod
 
-We have a control plane and worker nodes.
+Another common Kubernetes challenge is when a Pod gets terminated with an:
 
-On the control plane, we have different components:
+```text
+OOMKilled
+```
 
-API Server
-etcd
-Scheduler
-Controller Manager
-Cloud Controller Manager
+This means the container exceeded its available memory limit or the node experienced memory pressure.
 
-The API Server is a core component. It is present on the control plane and is used to expose Kubernetes.
-This Kubernetes cluster has to be exposed to the external world.
-It is like the heart of Kubernetes and takes requests from the external world.
-The Scheduler is used to schedule components on nodes. It is responsible for scheduling resources or pods on Kubernetes.
-etcd acts like a backup server. It is basically a key-value store where the entire Kubernetes cluster information is stored as key-value pairs.
-The Controller Manager supports auto-scaling, for example: ReplicaSet.
-data plain(worker nodes)
----------------------
-There are 3 components:
+The Pod may subsequently enter:
 
-Kubelet
-Container Runtime
-Kube Proxy
+```text
+CrashLoopBackOff
+```
 
-The request will go through the control plane.
+## Real-World Scenario
 
-We have a component called Kubelet. It is responsible for running your pods and maintaining them.
-If a pod is not running, Kubernetes informs it to restart.
+After configuring resource requests, limits, and quotas, I identified that one of the Pods was repeatedly getting:
 
-For running pods, we need a container runtime (like containerd).
+```text
+OOMKilled
+```
 
-Kube Proxy provides networking. It handles IP addresses and load balancing.
+and eventually going into:
 
-## Kubernetes Architecture (Interview Notes)
+```text
+CrashLoopBackOff
+```
+
+The application was a Java-based microservice.
+
+## Troubleshooting
+
+First, I checked the Pod:
+
+```bash
+kubectl get pod <pod-name>
+```
+
+Then I checked the details:
+
+```bash
+kubectl describe pod <pod-name>
+```
+
+I also checked the previous container logs:
+
+```bash
+kubectl logs <pod-name> --previous
+```
+
+Since it was a Java application, I worked with the development team to collect diagnostic information such as:
+
+* Java heap dump
+* Thread dump
+
+The heap dump helped the developers investigate excessive heap usage and potential memory leaks.
+
+I shared the diagnostic information with the development team so they could analyze the application and identify the root cause.
+
+After the application-side issue was addressed, we monitored the Pod to make sure it remained stable and did not get OOMKilled again.
+
+### Important Interview Point
+
+Do not simply say:
+
+> "I increased the memory limit."
+
+A better approach is:
+
+> "I first identify why the application is consuming excessive memory. Increasing the limit may temporarily hide the problem but does not necessarily fix the root cause."
+
+---
+
+# 3. Kubernetes Upgrade Challenges
+
+Kubernetes upgrades can be challenging because the cluster contains multiple components and workloads that need to remain compatible and available.
+
+## Real-World Approach
+
+For Kubernetes upgrades, we prepared a detailed manual with step-by-step procedures.
+
+Before performing the upgrade, we documented:
+
+* Backup requirements
+* Kubernetes version compatibility
+* Release notes
+* Upgrade prerequisites
+* Application compatibility checks
+* Rollback/recovery procedures
+
+The upgrade process was divided into:
+
+1. Control plane
+2. Worker nodes
+
+## Control Plane
+
+Before upgrading the control plane, we verified the health of important components such as:
+
+* API Server
+* etcd
+* Scheduler
+* Controller Manager
+
+We also ensured that the required etcd backup/recovery procedures were available.
+
+After the upgrade, we verified that the control plane components were healthy.
+
+## Worker Nodes
+
+Before upgrading a worker node, we safely moved workloads away from that node.
+
+For example:
+
+```bash
+kubectl drain <node-name> --ignore-daemonsets
+```
+
+Then the node was upgraded.
+
+After the upgrade, we verified:
+
+```bash
+kubectl get nodes
+```
+
+and ensured that the node returned to:
+
+```text
+Ready
+```
+
+After all worker nodes were upgraded, we performed application-level validation.
+
+We checked:
+
+* Pods
+* Services
+* Deployments
+* Application connectivity
+* Application health
+
+The complete process was documented so that the upgrade could be performed consistently and safely by other team members.
+
+---
+
+# 4. Kubernetes Architecture
 
 Kubernetes architecture is mainly divided into two parts:
 
-1. Control Plane
-2. Worker Nodes (Data Plane)
+1. **Control Plane**
+2. **Worker Nodes / Data Plane**
+
+```text
+                 Kubernetes Cluster
+                        |
+          +-------------+-------------+
+          |                           |
+    Control Plane                 Worker Nodes
+       (Brain)                    (Data Plane)
+          |                           |
+    +-----+------+              +-----+------+
+    |     |      |              |     |      |
+ API   Scheduler etcd        Kubelet Runtime Kube-Proxy
+Server
+    |
+Controller
+Manager
+```
 
 ---
 
-## Control Plane (Brain of Kubernetes)
+# 5. Control Plane Components
 
-The control plane manages the entire Kubernetes cluster.
+The Control Plane manages the overall Kubernetes cluster and maintains the desired state.
 
-**Key Components:**
+## 5.1 API Server
 
-* **API Server**
-  The core component and entry point to Kubernetes.
-  It exposes the Kubernetes cluster to external users and handles all incoming requests.
+The API Server is the main entry point to the Kubernetes API.
 
-* **etcd**
-  A key-value store that stores all cluster data and configuration.
-  It acts as the source of truth for the cluster.
+It:
 
-* **Scheduler**
-  Responsible for assigning pods to worker nodes based on resource availability.
+* Receives requests from users, automation, and Kubernetes components
+* Validates requests
+* Authenticates/authorizes requests
+* Exposes the Kubernetes API
+* Communicates with etcd
+* Acts as the central communication point between Kubernetes components
 
-* **Controller Manager**
-  Ensures the desired state of the cluster is maintained.
-  Example: Handles ReplicaSets for auto-scaling and self-healing.
+Example:
 
-* **Cloud Controller Manager**
-  Manages interactions with the cloud provider (if using cloud platforms).
+```text
+kubectl
+   |
+   ↓
+API Server
+```
 
----
+### Interview Statement
 
-## Worker Nodes (Data Plane)
-
-Worker nodes are responsible for running applications (pods).
-
-**Key Components:**
-
-* **Kubelet**
-  An agent that runs on each node.
-  It ensures containers are running as expected and restarts them if needed.
-
-* **Container Runtime**
-  Used to run containers (e.g., containerd, Docker).
-
-* **Kube Proxy**
-  Handles networking inside the cluster.
-  Manages IP routing and load balancing between services.
+> "The API Server is the central entry point to the Kubernetes API. It receives and processes requests and acts as the communication hub for Kubernetes components."
 
 ---
 
-## Flow (How it works)
+# 6. etcd
 
-1. User sends a request → API Server
-2. API Server validates and stores data in etcd
-3. Scheduler assigns the pod to a worker node
-4. Kubelet runs the pod using container runtime
-5. Kube Proxy manages networking and access
+`etcd` is a distributed key-value store used by Kubernetes to store cluster state.
+
+It stores information such as:
+
+* Cluster configuration
+* Kubernetes objects
+* Desired state
+* Metadata
+* Secrets and configuration data
+
+It is the **source of truth for Kubernetes cluster state**.
+
+### Important Correction
+
+Do not describe etcd as simply:
+
+> "A backup server."
+
+That is incorrect.
+
+Better:
+
+> "etcd is the distributed key-value store and source of truth for Kubernetes cluster state."
+
+Backups of etcd can be taken, but **etcd itself is not a backup server**.
 
 ---
 
-## Key Points to Impress Interviewers
+# 7. Scheduler
 
-* API Server is the **entry point** of Kubernetes
-* etcd is the **database (source of truth)**
-* Scheduler decides **where pods run**
-* Kubelet ensures **pods are always running**
-* Kube Proxy handles **networking and load balancing**
-* Kubernetes follows **desired state management**
+The Kubernetes Scheduler is responsible for deciding **which worker node should run a newly created Pod**.
 
+It considers factors such as:
 
-## Deployement strategies
+* CPU and memory requests
+* Node availability
+* Node selectors
+* Affinity/anti-affinity
+* Taints and tolerations
+* Other scheduling constraints
 
-we have 3 types
-1. Rolling update (by default)
-2. blue green
-3. canary
+Example:
 
-Uisng ingress controller we will configure by default this are k8 out of box
-so why we need deplooyment means to reduce the download for doing upgradations and also we make zero down time
-rolling update deployement stargy it is intrduce the down time to zero
-using rolling update we can perform zero down time version upgrade we can reach to near downtime 
+```text
+New Pod
+   |
+   ↓
+Scheduler
+   |
+   +----→ Worker Node 1
+   |
+   +----→ Worker Node 2
+   |
+   +----→ Worker Node 3
+```
+
+### Interview Statement
+
+> "The Scheduler is responsible for selecting an appropriate worker node for a Pod based on resource availability and scheduling constraints."
+
+---
+
+# 8. Controller Manager
+
+The Controller Manager runs various Kubernetes controllers.
+
+Controllers continuously compare:
+
+```text
+Desired State
+      vs
+Current State
+```
+
+and take action to bring the cluster back to the desired state.
+
+Examples include:
+
+* ReplicaSet controller
+* Deployment-related controllers
+* Node controller
+* Job controller
+
+For example, if a Deployment requires 3 Pods and only 2 are running, the controllers work to create the missing Pod.
+
+### Important Correction
+
+Don't say:
+
+> "Controller Manager supports auto-scaling."
+
+Auto-scaling is handled by dedicated mechanisms such as **Horizontal Pod Autoscaler (HPA)**.
+
+Better:
+
+> "The Controller Manager runs controllers that continuously reconcile the desired state with the current state."
+
+---
+
+# 9. Cloud Controller Manager
+
+The Cloud Controller Manager integrates Kubernetes with cloud-provider infrastructure.
+
+For example, it can manage cloud-specific resources such as:
+
+* Load balancers
+* Nodes
+* Routes
+* Cloud-specific integrations
+
+The exact behavior depends on the cloud provider and Kubernetes setup.
+
+---
+
+# 10. Worker Nodes / Data Plane
+
+Worker nodes are responsible for running application workloads.
+
+The major components are:
+
+1. Kubelet
+2. Container Runtime
+3. kube-proxy
+
+---
+
+# 11. Kubelet
+
+Kubelet is the Kubernetes agent running on each worker node.
+
+It:
+
+* Communicates with the API Server
+* Ensures containers described by Pods are running
+* Monitors Pod/container status
+* Reports node and Pod status back to Kubernetes
+
+Kubelet works with the container runtime to start and manage containers.
+
+### Important Correction
+
+Instead of saying:
+
+> "Kubelet runs the Pods."
+
+A more technically accurate statement is:
+
+> "Kubelet ensures that the containers specified by Pods are running on the node by communicating with the container runtime."
+
+---
+
+# 12. Container Runtime
+
+The container runtime is responsible for running containers.
+
+Examples include:
+
+* containerd
+* CRI-O
+
+The Kubernetes kubelet communicates with the container runtime through the Container Runtime Interface (CRI).
+
+```text
+Kubelet
+   |
+   ↓
+Container Runtime
+   |
+   ↓
+Containers
+```
+
+---
+
+# 13. kube-proxy
+
+`kube-proxy` is a node-level networking component traditionally responsible for implementing Kubernetes Service networking rules.
+
+It helps route traffic destined for Services toward their backend Pods.
+
+### Important Correction
+
+Don't say:
+
+> "kube-proxy handles all Kubernetes networking."
+
+Kubernetes networking is broader than kube-proxy and also involves the cluster's networking implementation/CNI.
+
+Better:
+
+> "kube-proxy implements Service networking rules on nodes and helps route Service traffic to backend Pods."
+
+---
+
+# 14. Kubernetes Request Flow
+
+A simplified flow when creating a Deployment/Pod is:
+
+```text
+User
+ |
+ | kubectl apply
+ ↓
+API Server
+ |
+ ↓
+etcd
+ |
+ ↓
+Scheduler
+ |
+ ↓
+Worker Node
+ |
+ ↓
+Kubelet
+ |
+ ↓
+Container Runtime
+ |
+ ↓
+Container / Pod
+```
+
+The controllers continuously monitor the cluster and reconcile the desired state.
+
+---
+
+# 15. Kubernetes Deployment Strategies
+
+Common deployment strategies include:
+
+1. Rolling Update
+2. Blue-Green Deployment
+3. Canary Deployment
+
+---
+
+# 16. Rolling Update
+
+Rolling Update is the **default Deployment strategy** for Kubernetes Deployments.
+
+Instead of stopping all old Pods and then starting new Pods, Kubernetes gradually replaces old Pods with new Pods.
+
+Example:
+
+```text
+Version 1
+
+Pod V1
+Pod V1
+Pod V1
+
+       ↓ Rolling Update
+
+Pod V1
+Pod V1
+Pod V2
+
+       ↓
+
+Pod V1
+Pod V2
+Pod V2
+
+       ↓
+
+Pod V2
+Pod V2
+Pod V2
+```
+
+### Advantages
+
+* Gradual rollout
+* Reduced disruption
+* Easy rollback
+* No need to manually stop the entire application
+
+The goal can be **zero downtime**, provided the application, readiness probes, capacity, and rollout configuration are designed appropriately.
+
+### Important Correction
+
+Don't say:
+
+> "Rolling update always gives zero downtime."
+
+Better:
+
+> "Rolling Update can provide zero or near-zero downtime when the application and Kubernetes configuration are designed correctly."
+
+---
+
+# 17. Blue-Green Deployment
+
+In Blue-Green deployment, two versions of the application are maintained:
+
+```text
+Blue  → Current Version
+Green → New Version
+```
+
+Example:
+
+```text
+             Service
+                |
+                ↓
+           Blue Version
+           Version 1
+```
+
+After testing the new version:
+
+```text
+             Service
+                |
+                ↓
+          Green Version
+          Version 2
+```
+
+Traffic is switched from Blue to Green.
+
+### Advantages
+
+* Easy rollback
+* New version can be tested before switching traffic
+* Fast traffic switch
+
+### Disadvantage
+
+It may require additional infrastructure/resources because both versions may need to run simultaneously.
+
+---
+
+# 18. Canary Deployment
+
+In a Canary deployment, only a small percentage of traffic is initially sent to the new version.
+
+Example:
+
+```text
+              Users
+                |
+                ↓
+          Traffic Router
+           /          \
+          /            \
+       90%              10%
+        ↓                 ↓
+    Version 1          Version 2
+```
+
+If Version 2 is healthy, traffic can gradually increase:
+
+```text
+90% / 10%
+   ↓
+70% / 30%
+   ↓
+50% / 50%
+   ↓
+0% / 100%
+```
+
+Canary deployments are useful for reducing deployment risk.
+
+---
+
+# 19. Ingress and Deployment Strategies
+
+Ingress is **not itself a deployment strategy**.
+
+Ingress is primarily used to manage HTTP/HTTPS traffic entering the cluster.
+
+Depending on the Ingress controller and configuration, traffic routing can be used to support patterns such as:
+
+* Blue-Green
+* Canary
+* Host-based routing
+* Path-based routing
+
+However, these deployment strategies are not automatically provided simply because Ingress exists.
+
+---
+
+# 20. Why Do We Need Deployment Strategies?
+
+Deployment strategies help us:
+
+* Reduce application downtime
+* Reduce deployment risk
+* Perform controlled version upgrades
+* Gradually release new versions
+* Roll back when problems occur
+* Improve application availability
+
+---
+
+# 21. Quick Interview Revision
+
+### Prometheus/Kubernetes Challenges
+
+```text
+Resource Sharing
+       ↓
+ResourceQuota
+       +
+Resource Requests/Limits
+
+OOMKilled
+       ↓
+Check Pod
+       ↓
+Check logs
+       ↓
+Check previous logs
+       ↓
+Heap/Thread dump for Java
+       ↓
+Developer analysis
+       ↓
+Fix root cause
+
+Kubernetes Upgrade
+       ↓
+Backup
+       ↓
+Check compatibility/release notes
+       ↓
+Upgrade control plane
+       ↓
+Drain worker node
+       ↓
+Upgrade worker
+       ↓
+Uncordon/verify
+       ↓
+Application validation
+```
+
+### Kubernetes Architecture
+
+```text
+CONTROL PLANE
+│
+├── API Server
+├── etcd
+├── Scheduler
+├── Controller Manager
+└── Cloud Controller Manager
+
+WORKER NODE
+│
+├── Kubelet
+├── Container Runtime
+└── kube-proxy
+```
+
+### Deployment Strategies
+
+```text
+Rolling Update → Gradually replace old Pods
+Blue-Green     → Switch traffic between two versions
+Canary         → Gradually expose users to new version
+```
+
+### Key Interview Corrections
+
+| Avoid saying                                | Better statement                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| etcd is a backup server                     | etcd is the cluster's key-value store/source of truth                          |
+| Controller Manager does auto-scaling        | Controllers reconcile desired vs current state; HPA handles Pod autoscaling    |
+| Kubelet runs Pods                           | Kubelet ensures Pod containers are running via the container runtime           |
+| kube-proxy handles all networking           | kube-proxy implements Service networking rules                                 |
+| Every Rolling Update gives zero downtime    | Rolling Update can provide zero/near-zero downtime when properly configured    |
+| Ingress is a deployment strategy            | Ingress manages incoming HTTP/HTTPS traffic and can support routing patterns   |
+| ResourceQuota limits an individual Pod      | ResourceQuota limits aggregate namespace resource usage                        |
+| Pod OOMKilled always means CrashLoopBackOff | OOMKilled can cause restarts; repeated failures can result in CrashLoopBackOff |
