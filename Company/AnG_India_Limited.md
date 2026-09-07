@@ -31,29 +31,35 @@ The important point is that I would use `force-unlock` **only after confirming t
 ### Flow
 
 ```text
-Jenkins Pipeline
+
+   Terraform Pipeline
        ↓
-Terraform Operation
+State Locked?
        ↓
-State Locked
+      YES
        ↓
 Check Lock Information
        ↓
 Is another Terraform operation running?
        ↓
-   ┌─── Yes ───→ Wait for it to complete
+   ┌─── YES ───→ WAIT
+   │               ↓
+   │        Operation finishes
+   │               ↓
+   │          Lock released
    │
-   └─── No
-        ↓
-Confirm lock is stale
-        ↓
-terraform force-unlock <LOCK_ID>
-        ↓
-terraform plan
-        ↓
-Verify changes
-        ↓
-Rerun Pipeline
+   └─── NO ───→ Lock is probably stale
+                    ↓
+          Confirm previous operation
+          crashed/was terminated
+                    ↓
+       terraform force-unlock <LOCK_ID>
+                    ↓
+             terraform plan
+                    ↓
+             Check the plan
+                    ↓
+             terraform apply
 ```
 
 ---
