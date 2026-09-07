@@ -1,14 +1,15 @@
-Sure. My name is Naga Lakshmi, and I’m a DevOps Engineer with around four years of experience.
+Sure. My name is Nagalakshmi, and I’m a DevOps Engineer with around four years of experience.
 
-Currently, I’m working with HTC Global Services as a DevOps Engineer, and I’m working on a project called Open ERP Immigration.
+Currently, I’m working with HTC Global Services as a DevOps Engineer, and my current project is Open ERP Migration.
 
-In my current role, I mainly work on AWS, CI/CD, Docker, Kubernetes, Terraform, and Jenkins. I’m involved in the complete deployment process — starting from the code, building the Docker image, doing security and quality checks, pushing the image to ECR, and finally deploying the application into Kubernetes using Amazon EKS.
+In my current role, I mainly work with AWS, Terraform, Docker, Kubernetes, and Jenkins. My main responsibility is to manage the complete deployment process — starting from the source code, building the Docker image, performing security and quality checks, pushing the image to ECR, and finally deploying the application to Kubernetes using Amazon EKS.
 
-I also work with Terraform for provisioning AWS infrastructure and use tools like Ansible for configuration management. For Kubernetes deployments, I have worked with Helm and Argo CD, and I’ve also worked on Blue-Green deployments and Horizontal Pod Autoscaling.
+I also work with Terraform for provisioning AWS infrastructure and Ansible for configuration management. I have worked on implementing Blue-Green deployments and Horizontal Pod Autoscaling for application scalability.
 
-For monitoring, I have experience with Prometheus and Grafana. I’ve also worked on integrating SonarQube and vulnerability scanning into the CI/CD pipeline as part of a DevSecOps approach.
+For monitoring, I have worked with Prometheus and Grafana. I have also integrated SonarQube and vulnerability scanning into the CI/CD pipeline as part of the DevSecOps approach.
 
-Before HTC, I worked with Deloitte as a DevOps Engineer, where I mainly worked on AWS infrastructure, Terraform, Ansible, and Jenkins. I worked on creating reusable Terraform modules and automating infrastructure and application deployments across different environments.
+Before HTC, I worked with Deloitte as a DevOps Engineer, where I mainly worked on AWS, Terraform, Ansible, and Jenkins.
 
-Before moving completely into DevOps, I worked as a Python Developer, where I developed REST APIs using Python and PostgreSQL and worked with SQLAlchemy.
+Before moving into DevOps, I also worked as a Python Developer, where I worked with Python, PostgreSQL, and REST APIs.
 
+So overall, my experience is mainly around cloud infrastructure, CI/CD automation, containerization, Kubernetes, and deployment automation. I’m really interested in DevOps and cloud technologies, and I’m looking forward to taking on more challenging opportunities and growing further in this area.
