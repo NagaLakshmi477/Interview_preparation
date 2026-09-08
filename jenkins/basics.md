@@ -189,3 +189,32 @@ This initiative also promoted a strong quality culture in the team, and I was re
 * Shift Left strategy implementation
 * Driving team adoption and change management
 * Improving code quality, security, and maintainability
+4. You have Python, Node.js and Java applications. How would you design a common CI/CD reusable workflow?
+
+If I have Python, Node.js and Java applications, I would not create three completely separate CI/CD pipelines because most of the CI/CD steps are common.
+
+I would create one reusable CI/CD workflow and make the application-specific parts configurable.
+
+The common stages would be checkout, build, testing, security scanning, Docker image build, pushing the image to the registry, and deployment.
+
+Only the build and test commands would be different for each application.
+
+For example, for Python I can use pip and pytest, for Node.js I can use npm, and for Java I can use Maven.
+
+So I would pass the required inputs, such as the application type or build commands, to the reusable workflow. Based on those inputs, the workflow executes the required commands while the remaining CI/CD process stays common.
+
+9. how do you setup reusable workflows for 10 microservices ? how pipelines triggers for diff microservices ?
+
+Java / Maven
+
+7. MVN clean install vs MVN clean package ?
+
+mvn clean package first removes the old target directory, then compiles, tests and packages the application. Finally, it creates the JAR or WAR file inside the target directory.
+
+mvn clean install does all the same steps, but after creating the JAR or WAR, it also installs that artifact into the local Maven repository.
+
+So the main difference is:
+
+package → creates the artifact in the target directory.
+
+install → creates the artifact and also installs it into the local Maven repository.
