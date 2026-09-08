@@ -980,19 +980,17 @@ Validate
 Rerun Pipeline
 ```
 
-This makes the answer sound like **real production troubleshooting** rather than only giving a definition.
-
-
-21. Explain how SonarQube is integrated into your Jenkins CI/CD pipeline and what metrics it checks.
 22. Where are Terraform state/locking details stored when using DynamoDB with S3?
-23. Why are locks and state files stored using S3 and DynamoDB in Terraform?
-24. What is the use of Prometheus and Grafana?
-25. What kind of data/metrics are collected by Prometheus and Grafana?
-26. What specific metrics does Prometheus capture, and what is the exact role of Grafana?
-27. Why have you switched companies a few times over your six years of experience :rolling_on_the_floor_laughing: (maybw we frastrated ,just ignore )
-28. What source code management tool do you use?
-29. Is it GitLab or GitHub? Which one?
-30. When you are using GitHub, how do you create a CI/CD pipeline?
-31. What is the integration layer between GitHub and Jenkins?
-32. What is the use of GitHub Actions?
-33. How do you troubleshoot failed Jenkins pipelines, specifically around SonarQube Quality Gate failures?
+    Terraform stores the state file in an S3 bucket. DynamoDB is used to maintain the state lock, which prevents multiple Terraform operations from modifying the same state simultaneously. So, S3 stores the Terraform state, and DynamoDB handles the locking.
+24. Why are locks and state files stored using S3 and DynamoDB in Terraform?
+    Terraform state needs to be shared among team members, so we store the state file remotely in S3. Since multiple users or CI pipelines might run Terraform at the same time, we need state locking to prevent concurrent modifications. In the traditional S3 backend setup, DynamoDB is used for this locking mechanism. S3 provides centralized and durable state storage, while DynamoDB helps coordinate access to that state
+26. What is the use of Prometheus and Grafana?
+27. What kind of data/metrics are collected by Prometheus and Grafana?
+28. What specific metrics does Prometheus capture, and what is the exact role of Grafana?
+29. Why have you switched companies a few times over your six years of experience :rolling_on_the_floor_laughing: (maybw we frastrated ,just ignore )
+30. What source code management tool do you use?
+31. Is it GitLab or GitHub? Which one?
+32. When you are using GitHub, how do you create a CI/CD pipeline?
+33. What is the integration layer between GitHub and Jenkins?
+34. What is the use of GitHub Actions?
+35. How do you troubleshoot failed Jenkins pipelines, specifically around SonarQube Quality Gate failures?
