@@ -82,3 +82,18 @@ Overall, our architecture follows a **DevSecOps and Shift-Left approach**, where
              |
              ↓
       Kubernetes - Prod
+
+Recruiter: Explain the project you are currently working on.
+Currently, I’m working on an enterprise application project where my primary responsibility is managing the DevOps activities, including CI/CD pipeline implementation, infrastructure automation, and application deployments.
+We use AWS for cloud infrastructure and tools like Jenkins, Docker, Kubernetes, Terraform, and Ansible for build automation, containerization, deployment, and infrastructure management.
+My main responsibility is to maintain and enhance the CI/CD pipelines using Jenkins. Whenever a developer commits code to Git, the pipeline gets triggered. We use Maven for building the application and running unit tests, SonarQube for code-quality analysis, and AppScan for security scanning. We follow a DevSecOps approach and Shift-Left strategy to identify issues early in the development lifecycle.
+Once the build and quality checks are successful, we deploy the application to Kubernetes using Helm. We also use Argo CD for GitOps-based deployments and manage application releases across environments.
+Apart from CI/CD, I work on infrastructure provisioning using Terraform, configuration management using Ansible, and troubleshooting deployment and environment-related issues.
+Overall, my role is to automate the deployment process, maintain the infrastructure, improve pipeline reliability, and ensure smooth and secure application releases.”
+How to remember this answer
+Remember these five points instead of memorizing every sentence:
+1. Project: Enterprise application.
+2. Role: DevOps Engineer.
+3. Tools: AWS, Jenkins, Docker, Kubernetes, Terraform, Ansible.
+4. CI/CD: Maven → SonarQube → AppScan → Helm → Kubernetes → Argo CD.
+5. Responsibilities: Automation, infrastructure, deployments, and troubleshooting.
