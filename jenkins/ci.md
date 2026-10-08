@@ -25,3 +25,60 @@ So overall, by catching code-quality and security issues early, we reduce securi
 **Recruiter:** Why Helm?
 
 **Me:** Helm lets us package and manage our Kubernetes configurations as templates. We can reuse the same chart across environments and just change the values, like image version or replicas, instead of maintaining separate YAML files for each environment.
+**Recruiter:** Can you explain your project architecture?
+
+**Me:** Sure. I'll explain it in two parts: the **application side** and the **delivery side**.
+
+On the application side, we have a **Java application built using Maven**. We package the application as a container image and run it on Kubernetes. We have separate deployments for different environments like Dev and Production, and we use **Helm to manage the Kubernetes deployment configuration**. This allows us to use the same Helm chart across environments with different values.
+
+The application exposes APIs, which we use for API and functional testing after deployment.
+
+On the delivery side, most of my work was around the **CI/CD pipeline**. A developer pushes code to Git, which triggers Jenkins. Jenkins checks out the code, Maven builds the application and runs the unit tests. Then SonarQube performs code-quality analysis and checks the defined quality gates. We also run AppScan for security scanning.
+
+If all the checks pass, the application is deployed to the Dev environment on Kubernetes using Helm. After deployment, we run API and functional tests to verify that the application is working as expected.
+
+For continuous deployment, we use **Argo CD with a GitOps approach**. The desired Kubernetes configuration is maintained in Git, and Argo CD continuously synchronizes the cluster with that desired state. After testing and approval, we promote the application to Production through Argo CD.
+
+For sensitive information like passwords and tokens, we don't hardcode them. We manage them securely using **Jenkins Credentials**.
+
+So, at a high level, the flow is:
+
+**Git → Jenkins → Maven → Unit Tests → SonarQube → AppScan → Helm → Kubernetes Dev → API/Functional Tests → Argo CD → Production**
+
+Overall, our architecture follows a **DevSecOps and Shift-Left approach**, where we identify quality and security issues early in the CI pipeline, while Git serves as the source of truth for the Kubernetes deployment state.
+
+                  Developer
+                      |
+                      ↓
+                    Git
+                      |
+                      ↓
+                   Jenkins
+                      |
+             ┌────────┴────────┐
+             ↓                 ↓
+           Maven           Unit Tests
+             |
+             ↓
+         SonarQube
+       Quality Gate
+             |
+             ↓
+          AppScan
+      Security Scan
+             |
+             ↓
+           Helm
+             |
+             ↓
+       Kubernetes - Dev
+             |
+             ↓
+     API / Functional Tests
+             |
+             ↓
+          Argo CD
+       GitOps / Sync
+             |
+             ↓
+      Kubernetes - Prod
