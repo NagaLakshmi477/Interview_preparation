@@ -295,19 +295,17 @@ Containers can communicate using container names instead of IP addresses.
 
 ## 19. Difference between volume and bind mount
 
-### Volume:
+Now, let's understand the difference between Docker volumes and bind mounts.
 
-* Managed by Docker
-* Stored in Docker’s internal directory
-* More secure
-* Preferred in production
+Both are used to persist data and share files between the host machine and containers.
 
-### Bind mount:
+First, a Docker volume is managed by Docker. We don't need to specify the exact host directory. Docker manages the storage location for us. Volumes are commonly used for database data and application data that must persist even after a container is removed.
 
-* Managed by host system(system used os)
-* Uses existing host directory path
-* Not portable
-* Less secure
+Second, a bind mount uses a specific file or directory from the host machine. For example, if I have a folder on my Windows laptop, I can mount that folder inside a Docker container. Changes made to the shared files can be seen from both the host and the container.
+
+The main difference is that Docker manages volumes, whereas bind mounts use a host path that we specify.
+
+In production, volumes are often preferred for persistent application data because they are easier to manage. However, both volumes and bind mounts require appropriate access controls and permissions.
 
 ---
 
