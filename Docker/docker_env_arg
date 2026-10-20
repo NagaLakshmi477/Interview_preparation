@@ -1,0 +1,15 @@
+
+# Base image
+FROM ubuntu:22.04
+
+# ARG: Available during image build
+ARG APP_VERSION=1.0
+
+# ENV: Available during build and container runtime
+ENV APP_NAME="DevOps Grind"
+
+# Use ARG during the build
+RUN echo "Building application version: $APP_VERSION"
+
+# Command executed when container starts
+CMD ["sh", "-c", "echo \"Application: $APP_NAME\" && echo \"Version: $APP_VERSION\""]
