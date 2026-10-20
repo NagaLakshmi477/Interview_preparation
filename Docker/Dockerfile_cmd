@@ -1,0 +1,12 @@
+
+# Base image
+FROM ubuntu:22.04
+
+# RUN: Executes during image build
+RUN apt-get update && apt-get install -y curl
+
+# ENTRYPOINT: Main command when the container starts
+ENTRYPOINT ["echo", "Hello from Docker"]
+
+# CMD: Default argument passed to ENTRYPOINT
+CMD ["DevOps Grind"]
