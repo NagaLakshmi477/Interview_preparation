@@ -111,7 +111,10 @@ Finally, we use a .dockerignore file to exclude unnecessary files, such as virtu
 By applying these techniques, we can reduce image size, improve build speed, and make Docker builds more efficient.
 
 ---
+##  How do multi-stage builds work?
+Multi-stage builds in Docker are used to reduce the final image size. We use multiple FROM instructions in a single Dockerfile. In the first stage, we build the application using tools like Maven and JDK. In the second stage, we use a lightweight runtime image and copy only the required application artifact from the first stage using COPY --from. This removes unnecessary build tools from the final image, making it smaller and more secure
 
+---
 ## 9. Dockerfile Layer Caching Deep Dive?
 
 Each instruction in a Dockerfile creates a new immutable layer
