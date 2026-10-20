@@ -96,11 +96,19 @@ A .dockerignore file tells Docker which files or folders to skip when building a
 
 ## 8. How to optimize Docker layers?
 
-* Combine multiple RUN commands using &&
-* Use multi-stage builds to reduce final image size
-* Order Dockerfile instructions properly (least changing → most changing)
-* use lightweight images
-* use .dockerignore file
+Now, let's understand how to optimize Docker layers.
+
+First, we can combine related RUN commands using the double ampersand operator to reduce unnecessary image layers.
+
+Second, we can use multi-stage builds. This allows us to keep only the required application files and dependencies in the final image.
+
+Third, we should order Dockerfile instructions properly. For example, we copy the requirements file before copying the application code. This helps Docker reuse cached dependency layers when only the application code changes.
+
+Fourth, we can use lightweight base images, such as Python slim images, to reduce image size.
+
+Finally, we use a .dockerignore file to exclude unnecessary files, such as virtual environments, cache files, and Git history, from the build context.
+
+By applying these techniques, we can reduce image size, improve build speed, and make Docker builds more efficient.
 
 ---
 
